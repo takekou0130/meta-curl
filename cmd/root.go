@@ -21,8 +21,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/spf13/cobra"
-	"golang.org/x/net/html"
 
 	"github.com/spf13/viper"
 )
@@ -56,22 +56,13 @@ func fetch(cmd *cobra.Command, args []string) {
 	}
 	defer res.Body.Close()
 
-	node, err := html.Parse(res.Body)
+	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var f func(*html.Node)
-	f = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "title" {
-			// Do something with n...
-			fmt.Println(n.Attr)
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			f(c)
-		}
-	}
-	f(node)
+	title := doc.Find("title").Text()
+	fmt.Println(title)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
