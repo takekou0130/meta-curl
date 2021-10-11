@@ -17,8 +17,12 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 	"os"
+
 	"github.com/spf13/cobra"
+	"golang.org/x/net/html"
 
 	"github.com/spf13/viper"
 )
@@ -28,16 +32,46 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "meta-curl",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "this is my application",
+	Long: `
+	meta-curl is a command for fetch page meta infomation.
+	you can use this command for SEO.
+	`,
+	Args: cobra.ExactArgs(1),
+	Run:  fetch,
+}
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+func fetch(cmd *cobra.Command, args []string) {
+	url := args[0]
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	client := new(http.Client)
+
+	res, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+
+	node, err := html.Parse(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var f func(*html.Node)
+	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "title" {
+			// Do something with n...
+			fmt.Println(n.Attr)
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			f(c)
+		}
+	}
+	f(node)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
