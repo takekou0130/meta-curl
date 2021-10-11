@@ -29,6 +29,15 @@ import (
 
 var cfgFile string
 
+type metaInfo struct {
+	url         string
+	title       []string
+	description []string
+	keywords    []string
+	canonical   []string
+	alternate   []string
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "meta-curl",
@@ -61,8 +70,16 @@ func fetch(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
+	metaInfo := doc2metaInfo(doc)
+
+	fmt.Println(metaInfo.title)
+}
+
+func doc2metaInfo(doc *goquery.Document) *metaInfo {
 	title := doc.Find("title").Text()
-	fmt.Println(title)
+	m := new(metaInfo)
+	m.title = append(m.title, title)
+	return m
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
