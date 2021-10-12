@@ -56,6 +56,7 @@ func fetch(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	req.Header.Set("User-Agent", "")
 
 	client := new(http.Client)
 
@@ -70,15 +71,26 @@ func fetch(cmd *cobra.Command, args []string) {
 		log.Fatal(err)
 	}
 
-	metaInfo := doc2metaInfo(doc)
+	metaInfo := doc2metaInfo(url, doc)
 
-	fmt.Println(metaInfo.title)
+	fmt.Println(*metaInfo)
 }
 
-func doc2metaInfo(doc *goquery.Document) *metaInfo {
+func doc2metaInfo(url string, doc *goquery.Document) *metaInfo {
 	title := doc.Find("title").Text()
+	// TODO for文でとってくる
+	desc, _ := doc.Find("meta[name='description']").Attr("content")
+	key, _ := doc.Find("meta[name='keywords']").Attr("content")
+	cano, _ := doc.Find("link[rel='canonical']").Attr("href")
+	alt, _ := doc.Find("link[rel='alternate']").Attr("href")
+
 	m := new(metaInfo)
+	m.url = url
 	m.title = append(m.title, title)
+	m.description = append(m.description, desc)
+	m.keywords = append(m.keywords, key)
+	m.canonical = append(m.canonical, cano)
+	m.alternate = append(m.alternate, alt)
 	return m
 }
 
