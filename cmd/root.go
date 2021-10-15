@@ -73,7 +73,10 @@ func fetch(cmd *cobra.Command, args []string) {
 
 	metaInfo := doc2metaInfo(url, doc)
 
-	fmt.Println(*metaInfo)
+	err = output(*metaInfo)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func doc2metaInfo(url string, doc *goquery.Document) *metaInfo {
