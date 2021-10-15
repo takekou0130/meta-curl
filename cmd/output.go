@@ -10,14 +10,19 @@ import (
 func output(m metaInfo) error {
 	width := 60
 	desc := formatLongText(m.description[0], width)
+	keywords := strings.Join(m.keywords, ",")
 	data := [][]string{
 		{"url", m.url},
 		{"title", m.title[0]},
 		{"description", desc},
+		{"keywords", keywords},
+		{"canonical", m.canonical[0]},
+		{"alternate", m.alternate[0]},
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Name", "Sign"})
+	table.SetAutoWrapText(false)
 	for _, v := range data {
 		table.Append(v)
 	}
