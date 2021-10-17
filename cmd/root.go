@@ -70,13 +70,13 @@ func fetch(cmd *cobra.Command, args []string) {
 	metaInfo := doc2metaInfo(url, doc)
 
 	t := NewView("table")
-	err = t.Render(*metaInfo)
+	err = t.Render(metaInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func doc2metaInfo(url string, doc *goquery.Document) *domain.MetaInfo {
+func doc2metaInfo(url string, doc *goquery.Document) domain.MetaInfo {
 	title := doc.Find("title").Text()
 	// TODO for文でとってくる
 	desc, _ := doc.Find("meta[name='description']").Attr("content")
@@ -84,7 +84,7 @@ func doc2metaInfo(url string, doc *goquery.Document) *domain.MetaInfo {
 	cano, _ := doc.Find("link[rel='canonical']").Attr("href")
 	alt, _ := doc.Find("link[rel='alternate']").Attr("href")
 
-	var m *domain.MetaInfo
+	var m domain.MetaInfo
 	m.Url = url
 	m.Title = append(m.Title, title)
 	m.Description = append(m.Description, desc)
