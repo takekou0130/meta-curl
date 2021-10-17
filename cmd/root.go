@@ -24,12 +24,15 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/spf13/cobra"
 	"github.com/takekou0130/meta-curl/domain"
-	"github.com/takekou0130/meta-curl/view"
 
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+
+type View interface {
+	Render(domain.MetaInfo) error
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -66,8 +69,7 @@ func fetch(cmd *cobra.Command, args []string) {
 
 	metaInfo := doc2metaInfo(url, doc)
 
-	var t view.View
-	t = view.NewTableRenderer()
+	t := NewView("table")
 	err = t.Render(*metaInfo)
 	if err != nil {
 		log.Fatal(err)
