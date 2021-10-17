@@ -5,7 +5,12 @@ import (
 	"strings"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/takekou0130/meta-curl/domain"
 )
+
+type View interface {
+	Render(domain.MetaInfo) error
+}
 
 type tableRenderer struct {
 	width int
@@ -18,16 +23,16 @@ func NewTableRenderer() *tableRenderer {
 	return &tableRenderer{width: width, table: table}
 }
 
-func (tr *tableRenderer) Render(m MetaInfo) error {
-	desc := formatLongText(m.description[0], tr.width)
-	keywords := strings.Join(m.keywords, ",")
+func (tr *tableRenderer) Render(m domain.MetaInfo) error {
+	desc := formatLongText(m.Description[0], tr.width)
+	keywords := strings.Join(m.Keywords, ",")
 	data := [][]string{
-		{"url", m.url},
-		{"title", m.title[0]},
+		{"url", m.Url},
+		{"title", m.Title[0]},
 		{"description", desc},
 		{"keywords", keywords},
-		{"canonical", m.canonical[0]},
-		{"alternate", m.alternate[0]},
+		{"canonical", m.Canonical[0]},
+		{"alternate", m.Alternate[0]},
 	}
 
 	table := tr.table
