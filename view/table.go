@@ -1,4 +1,4 @@
-package cmd
+package view
 
 import (
 	"os"
@@ -7,8 +7,18 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-func output(m MetaInfo) error {
+type tableRenderer struct {
+	width int
+	table *tablewriter.Table
+}
+
+func NewTableRenderer() *tableRenderer {
 	width := 60
+	table := tablewriter.NewWriter(os.Stdout)
+	return &tableRenderer{width: width, table: table}
+}
+
+func (tr *tableRenderer) Render(m MetaInfo) error {
 	desc := formatLongText(m.description[0], width)
 	keywords := strings.Join(m.keywords, ",")
 	data := [][]string{
@@ -20,7 +30,6 @@ func output(m MetaInfo) error {
 		{"alternate", m.alternate[0]},
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Name", "Sign"})
 	table.SetAutoWrapText(false)
 	for _, v := range data {
