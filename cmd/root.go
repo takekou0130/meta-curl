@@ -23,19 +23,24 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/spf13/cobra"
+	"github.com/takekou0130/meta-curl/view"
 
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
 
-type metaInfo struct {
+type MetaInfo struct {
 	url         string
 	title       []string
 	description []string
 	keywords    []string
 	canonical   []string
 	alternate   []string
+}
+
+type View interface {
+	Render(MetaInfo) error
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -73,10 +78,15 @@ func fetch(cmd *cobra.Command, args []string) {
 
 	metaInfo := doc2metaInfo(url, doc)
 
-	fmt.Println(*metaInfo)
+	var t View
+	t = view.NewTableRenderer()
+	err = t.Render(*metaInfo)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func doc2metaInfo(url string, doc *goquery.Document) *metaInfo {
+func doc2metaInfo(url string, doc *goquery.Document) *MetaInfo {
 	title := doc.Find("title").Text()
 	// TODO for文でとってくる
 	desc, _ := doc.Find("meta[name='description']").Attr("content")
@@ -84,7 +94,7 @@ func doc2metaInfo(url string, doc *goquery.Document) *metaInfo {
 	cano, _ := doc.Find("link[rel='canonical']").Attr("href")
 	alt, _ := doc.Find("link[rel='alternate']").Attr("href")
 
-	m := new(metaInfo)
+	m := new(MetaInfo)
 	m.url = url
 	m.title = append(m.title, title)
 	m.description = append(m.description, desc)
