@@ -43,7 +43,11 @@ var rootCmd = &cobra.Command{
 	you can use this command for SEO.
 	`,
 	Args: cobra.ExactArgs(1),
-	Run:  fetch,
+	Run:  index,
+}
+
+func index(cmd *cobra.Command, args []string) {
+
 }
 
 func fetch(cmd *cobra.Command, args []string) {
