@@ -23,6 +23,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/spf13/cobra"
+	"github.com/takekou0130/meta-curl/adapter/controller"
 	"github.com/takekou0130/meta-curl/domain"
 
 	"github.com/spf13/viper"
@@ -47,7 +48,8 @@ var rootCmd = &cobra.Command{
 }
 
 func index(cmd *cobra.Command, args []string) {
-
+	controller := controller.NewController()
+	controller.IndexAction()
 }
 
 func fetch(cmd *cobra.Command, args []string) {
