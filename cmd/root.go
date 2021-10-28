@@ -17,23 +17,21 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/spf13/cobra"
 	"github.com/takekou0130/meta-curl/adapter/controller"
-	"github.com/takekou0130/meta-curl/domain"
+	"github.com/takekou0130/meta-curl/adapter/gateway"
+	"github.com/takekou0130/meta-curl/adapter/view"
+	"github.com/takekou0130/meta-curl/application/inputPort"
+	"github.com/takekou0130/meta-curl/application/repository"
+	"github.com/takekou0130/meta-curl/application/usecase"
 
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
-
-type View interface {
-	Render(domain.MetaInfo) error
-}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -48,56 +46,13 @@ var rootCmd = &cobra.Command{
 }
 
 func index(cmd *cobra.Command, args []string) {
-	controller := controller.NewController()
-	controller.IndexAction()
-}
-
-func fetch(cmd *cobra.Command, args []string) {
-	url := args[0]
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	req.Header.Set("User-Agent", "")
-
 	client := new(http.Client)
-
-	res, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-
-	doc, err := goquery.NewDocumentFromReader(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	metaInfo := doc2metaInfo(url, doc)
-
-	t := NewView("table")
-	err = t.Render(metaInfo)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func doc2metaInfo(url string, doc *goquery.Document) domain.MetaInfo {
-	title := doc.Find("title").Text()
-	// TODO for文でとってくる
-	desc, _ := doc.Find("meta[name='description']").Attr("content")
-	key, _ := doc.Find("meta[name='keywords']").Attr("content")
-	cano, _ := doc.Find("link[rel='canonical']").Attr("href")
-	alt, _ := doc.Find("link[rel='alternate']").Attr("href")
-
-	var m domain.MetaInfo
-	m.Url = url
-	m.Title = append(m.Title, title)
-	m.Description = append(m.Description, desc)
-	m.Keywords = append(m.Keywords, key)
-	m.Canonical = append(m.Canonical, cano)
-	m.Alternate = append(m.Alternate, alt)
-	return m
+	gw := gateway.NewGateway(client)
+	rp := &repository.Repository(*gw)
+	ip := &inputPort.InputPort(usecase.MetaInfoUsecase(rp))
+	v := view.NewTableRenderer()
+	controller := controller.NewController(ip, v)
+	controller.IndexAction(args)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

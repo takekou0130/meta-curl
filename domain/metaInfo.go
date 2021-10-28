@@ -1,7 +1,7 @@
 package domain
 
 type MetaInfo struct {
-	Url         string
+	Url         Url
 	Title       []string
 	Description []string
 	Keywords    []string
