@@ -13,7 +13,7 @@ type tableRenderer struct {
 	table *tablewriter.Table
 }
 
-func NewTableRenderer() *tableRenderer {
+func NewTableRenderer() View {
 	width := 60
 	table := tablewriter.NewWriter(os.Stdout)
 	return &tableRenderer{width: width, table: table}
@@ -23,7 +23,7 @@ func (tr *tableRenderer) Render(m domain.MetaInfo) error {
 	desc := formatLongText(m.Description[0], tr.width)
 	keywords := strings.Join(m.Keywords, ",")
 	data := [][]string{
-		{"url", m.Url},
+		{"url", m.Url.Url},
 		{"title", m.Title[0]},
 		{"description", desc},
 		{"keywords", keywords},
