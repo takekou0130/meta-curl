@@ -13,7 +13,7 @@ type tableRenderer struct {
 	table *tablewriter.Table
 }
 
-func NewTableRenderer() *tableRenderer {
+func NewTableRenderer() View {
 	width := 60
 	table := tablewriter.NewWriter(os.Stdout)
 	return &tableRenderer{width: width, table: table}

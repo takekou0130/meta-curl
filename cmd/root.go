@@ -24,8 +24,6 @@ import (
 	"github.com/takekou0130/meta-curl/adapter/controller"
 	"github.com/takekou0130/meta-curl/adapter/gateway"
 	"github.com/takekou0130/meta-curl/adapter/view"
-	"github.com/takekou0130/meta-curl/application/inputPort"
-	"github.com/takekou0130/meta-curl/application/repository"
 	"github.com/takekou0130/meta-curl/application/usecase"
 
 	"github.com/spf13/viper"
@@ -47,11 +45,10 @@ var rootCmd = &cobra.Command{
 
 func index(cmd *cobra.Command, args []string) {
 	client := new(http.Client)
-	gw := gateway.NewGateway(client)
-	rp := &repository.Repository(*gw)
-	ip := &inputPort.InputPort(usecase.MetaInfoUsecase(rp))
+	rp := gateway.NewGateway(client)
+	ip := usecase.NewMetaInfoUsecase(&rp)
 	v := view.NewTableRenderer()
-	controller := controller.NewController(ip, v)
+	controller := controller.NewController(&ip, &v)
 	controller.IndexAction(args)
 }
 

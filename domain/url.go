@@ -14,7 +14,7 @@ func NewUrl(url string) (*Url, error) {
 		return nil, fmt.Errorf("%v is empty", url)
 	}
 
-	if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
+	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
 		return nil, fmt.Errorf("%v is not url", url)
 	}
 

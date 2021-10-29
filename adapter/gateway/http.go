@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/takekou0130/meta-curl/application/repository"
 	"github.com/takekou0130/meta-curl/domain"
 )
 
@@ -12,7 +13,7 @@ type Gateway struct {
 	client *http.Client
 }
 
-func NewGateway(c *http.Client) *Gateway {
+func NewGateway(c *http.Client) repository.Repository {
 	return &Gateway{
 		client: c,
 	}

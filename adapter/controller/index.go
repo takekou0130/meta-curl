@@ -8,14 +8,14 @@ import (
 )
 
 type Controller struct {
-	inputPort *inputPort.InputPort
-	view      *view.View
+	inputPort inputPort.InputPort
+	view      view.View
 }
 
 func NewController(ip *inputPort.InputPort, v *view.View) *Controller {
 	return &Controller{
-		inputPort: ip,
-		view:      v,
+		inputPort: *ip,
+		view:      *v,
 	}
 }
 
@@ -24,9 +24,6 @@ func (c *Controller) IndexAction(args []string) {
 		fmt.Errorf("not expected arguments")
 	}
 
-	info, err := c.inputPort.MetaInfo(args)
-	if err != nil {
-		fmt.Errorf("%v", info)
-	}
+	info := c.inputPort.MetaInfo(args)
 	c.view.Render(info)
 }

@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/takekou0130/meta-curl/application/inputPort"
 	"github.com/takekou0130/meta-curl/application/repository"
 	"github.com/takekou0130/meta-curl/domain"
 )
 
 type MetaInfoUsecase struct {
-	repository *repository.Repository
+	repository repository.Repository
 }
 
-func NewMetaInfoUsecase(rp *repository.Repository) *MetaInfoUsecase {
+func NewMetaInfoUsecase(rp *repository.Repository) inputPort.InputPort {
 	return &MetaInfoUsecase{
-		repository: rp,
+		repository: *rp,
 	}
 }
 
@@ -30,7 +31,7 @@ func (m *MetaInfoUsecase) MetaInfo(args []string) domain.MetaInfo {
 	}
 
 	// TODO: 複数の情報を取れるようにする
-	doc, err := m.repository.Fetch(urls[0])
+	doc, err := m.repository.Fetch(*urls[0])
 	if err != nil {
 		fmt.Errorf("%v", doc)
 	}
