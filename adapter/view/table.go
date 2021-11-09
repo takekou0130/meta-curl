@@ -19,7 +19,7 @@ func NewTableRenderer() View {
 	return &tableRenderer{width: width, table: table}
 }
 
-func (tr *tableRenderer) Render(m domain.MetaInfo) error {
+func (tr *tableRenderer) Render(m *domain.MetaInfo) error {
 	desc := formatLongText(m.Description[0], tr.width)
 	keywords := strings.Join(m.Keywords, ",")
 	data := [][]string{

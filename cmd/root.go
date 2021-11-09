@@ -17,6 +17,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -49,7 +50,9 @@ func index(cmd *cobra.Command, args []string) {
 	ip := usecase.NewMetaInfoUsecase(&rp)
 	v := view.NewTableRenderer()
 	controller := controller.NewController(&ip, &v)
-	controller.IndexAction(args)
+	if err := controller.IndexAction(args); err != nil {
+		log.Fatalf("%+v", err)
+	}
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

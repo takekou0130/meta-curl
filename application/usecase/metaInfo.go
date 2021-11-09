@@ -1,9 +1,7 @@
 package usecase
 
 import (
-	"fmt"
-	"log"
-
+	"github.com/pkg/errors"
 	"github.com/takekou0130/meta-curl/application/inputPort"
 	"github.com/takekou0130/meta-curl/application/repository"
 	"github.com/takekou0130/meta-curl/domain"
@@ -19,12 +17,12 @@ func NewMetaInfoUsecase(rp *repository.Repository) inputPort.InputPort {
 	}
 }
 
-func (m *MetaInfoUsecase) MetaInfo(args []string) domain.MetaInfo {
+func (m *MetaInfoUsecase) MetaInfo(args []string) (*domain.MetaInfo, error) {
 	var urls []*domain.Url
 	for _, arg := range args {
 		url, err := domain.NewUrl(arg)
 		if err != nil {
-			log.Fatalf("%v is not url", arg)
+			return nil, errors.Wrap(err, "failed to domain.NewUrl")
 		} else {
 			urls = append(urls, url)
 		}
@@ -33,21 +31,42 @@ func (m *MetaInfoUsecase) MetaInfo(args []string) domain.MetaInfo {
 	// TODO: 複数の情報を取れるようにする
 	doc, err := m.repository.Fetch(*urls[0])
 	if err != nil {
-		fmt.Errorf("%v", doc)
+		return nil, errors.Wrap(err, "failed to repository.Fetch")
 	}
 
 	// TODO errorハンドリング
-	info := doc2metaInfo(doc)
-	return info
+	info, err := doc2metaInfo(doc)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to convert doc to metaInfo")
+	}
+	return info, nil
 }
 
-func doc2metaInfo(doc domain.Document) domain.MetaInfo {
-	return domain.MetaInfo{
-		Url:         doc.GetUrl(),
-		Title:       doc.GetTitle(),
-		Description: doc.GetDesc(),
-		Keywords:    doc.GetKeywords(),
-		Canonical:   doc.GetCanonicals(),
-		Alternate:   doc.GetAlternates(),
+func doc2metaInfo(doc *domain.Document) (*domain.MetaInfo, error) {
+	Url := doc.GetUrl()
+	Title := doc.GetTitle()
+	Description, err := doc.GetDesc()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get info")
 	}
+	Keywords, err := doc.GetKeywords()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get info")
+	}
+	Canonical, err := doc.GetCanonicals()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get info")
+	}
+	Alternate, err := doc.GetAlternates()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get info")
+	}
+	return &domain.MetaInfo{
+		Url,
+		Title,
+		Description,
+		Keywords,
+		Canonical,
+		Alternate,
+	}, nil
 }
