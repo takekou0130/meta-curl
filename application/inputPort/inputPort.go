@@ -5,5 +5,5 @@ import (
 )
 
 type InputPort interface {
-	MetaInfo([]string) domain.MetaInfo
+	MetaInfo([]string) (*domain.MetaInfo, error)
 }
